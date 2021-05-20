@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>PULSATION</title>
+        <meta name="author" content="Joseph Liu">
+
+        <!--JS9 is below; should allow us to view even without internet.-->
+        <link type="text/css" rel="stylesheet" href="js9-allinone.css">
+        <script type="text/javascript" src="js9-allinone.js"></script>
+        <style>
+            * {
+                font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            #menu-container {
+                width: 10vw;
+                display: none;
+                position: fixed;
+                z-index: 1;
+                background-color: white;
+            }
+
+            #data-container, #lc-container {
+                width: 1536px;
+                display: none;
+                padding: 0px;
+                margin: 0px;
+                margin-left: 12vw;
+            }
+
+            #load {
+                width: 100vw;
+            }
+
+            #menu {
+                overflow-y: auto;
+                width: 100%;
+                height: 95vh;
+                border: 2px solid #333;
+                border-radius: 4px;
+                background-color: white;
+            }
+
+            #menu p {
+                display: block;
+                padding: 0.5vw;
+                text-align: center;
+                user-select: none;
+                margin: 0px;
+            }
+
+            #menu p:hover {
+                background-color: #ccc;
+            }
+
+            #menu p.selected-link {
+                background-color: #333;
+                color: #ccc;
+            }
+
+            .label {
+                text-align: center;
+                font-weight: 600;
+                white-space: pre;
+            }
+
+            #lc {
+                width: 75%;
+            }
+        </style>
+        <script>
+            var obj_paths = {};
+            var frames475 = {};
+            var frames814 = {};
+            var menu_template = "<p>{objid}</p>";
+            function load_data(content) {
+                //Update display
+                document.getElementById("data-container").style.display = "block";
+                document.getElementById("lc-container").style.display = "block";
+                document.getElementById("menu-container").style.display = "block";
+                document.getElementById("load").style.display = "none";
+                
+
+                //Load folder info into dict from file
+                var lines = content.split("\n");
+                for (var i = 0; i < lines.length; i++) {
+                    if (lines[i].length == 0 || lines[i].trim().charAt(0) == "#") continue;
+                    var l = lines[i].trim().split(" ");
+                    obj_paths[l[0]] = l[1];
+                    frames475[l[0]] = parseInt(l[2]);
+                    frames814[l[0]] = parseInt(l[3]);
+                }
+
+                //Populate menu
+                for (const [key, value] of Object.entries(obj_paths)) {
+                    document.getElementById("menu").innerHTML += menu_template.replace("{objid}", key).replace("{objid}", key);
+                    document.getElementById("menu").lastChild.addEventListener("click", function() {set_star(key);});
+                }
+
+                //Init JS9
+                JS9.init();
+            }
+
+            async function set_star(objid) {
+                console.log("Setting star to " + objid);
+                
+                var path = "data/" + obj_paths[objid];
+
+                if (path.charAt(path.length - 1) != "/") path += "/";
+
+                document.getElementById("lc").src = path + "lc.png";
+                document.getElementById("header1").innerHTML = objid;
+                document.getElementById("header2").innerHTML = "# in F814W: " + frames814[objid] + "    |    # in F475W: " + frames475[objid];
+
+                for (var i = 0; i < Math.min(frames814[objid], 3); i++) {
+                    JS9.Load(path + "f814_" + i + ".fits", {display: "disp1" + i});
+                    await sleep(100);
+                }
+                for (var i = 0; i < Math.min(frames475[objid], 3); i++) {
+                    JS9.Load(path + "f475_" + i + ".fits", {display: "disp2" + i});
+                    await sleep(100);
+                }
+
+            }
+
+            function read_file(file)
+            {
+                // setting up the reader
+                var reader = new FileReader();
+                reader.readAsText(file); // this is reading as data url
+
+                // here we tell the reader what to do when it's done reading...
+                reader.onload = readerEvent => {
+                    var content = readerEvent.target.result; // this is the content!
+                    load_data(content);
+                }
+            }
+
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        </script>
+    </head>
+    <body>
+        <div id="menu-container">
+            <div id="menu"></div>
+        </div>
+        <table id="data-container">
+            <tr>
+                <td></td>
+                <td>
+                    <h1 class="label">PULSATION</h1>
+                    <h2 class="label">v0.1.1b</h2>
+                    <p class="label" id="header1"></p>
+                    <p class="label" id="header2"></p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="label">F814W Cutout 1</p>
+                    <div class="JS9Menubar" id="disp10-Menubar"></div>
+                    <div class="JS9" id="disp10" data-js9init="false"></div>
+                    <div class="JS9Colorbar" id="disp10-Colorbar"></div>
+                </td>
+                <td>
+                    <p class="label">F814W Cutout 2</p>
+                    <div class="JS9Menubar" id="disp11-Menubar"></div>
+                    <div class="JS9" id="disp11"></div>
+                    <div class="JS9Colorbar" id="disp11-Colorbar"></div>
+                </td>
+                <td>
+                    <p class="label">F814W Cutout 3</p>
+                    <div class="JS9Menubar" id="disp12-Menubar"></div>
+                    <div class="JS9" id="disp12"></div>
+                    <div class="JS9Colorbar" id="disp12-Colorbar"></div>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <p class="label">F475W Cutout 1</p>
+                    <div class="JS9Menubar" id="disp20-Menubar"></div>
+                    <div class="JS9" id="disp20" data-js9init="false"></div>
+                    <div class="JS9Colorbar" id="disp20-Colorbar"></div>
+                </td>
+                <td>
+                    <p class="label">F475W Cutout 2</p>
+                    <div class="JS9Menubar" id="disp21-Menubar"></div>
+                    <div class="JS9" id="disp21"></div>
+                    <div class="JS9Colorbar" id="disp21-Colorbar"></div>
+                </td>
+                <td>
+                    <p class="label">F475W Cutout 3</p>
+                    <div class="JS9Menubar" id="disp22-Menubar"></div>
+                    <div class="JS9" id="disp22"></div>
+                    <div class="JS9Colorbar" id="disp22-Colorbar"></div>
+                </td>
+            </tr>
+        </table>
+
+        <div id="lc-container">
+            <p class="label">Light Curve</p>
+            <img id="lc">
+        </div>
+
+        <div id="load">
+            <button onclick="document.getElementById('file-select').click();">Select Data File</button>
+            <input id="file-select" type="file" name="file-select" style="display: none;" onchange="read_file(this.files[0])"/>
+            <p>See instructions in README.md</p>
+        </div>
+    </body>
+</html>
