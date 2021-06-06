@@ -74,6 +74,7 @@
             var frames475 = {};
             var frames814 = {};
             var menu_template = "<p>{objid}</p>";
+
             function load_data(content) {
                 //Update display
                 document.getElementById("data-container").style.display = "block";
@@ -91,15 +92,19 @@
                     frames475[l[0]] = parseInt(l[2]);
                     frames814[l[0]] = parseInt(l[3]);
                 }
-
                 //Populate menu
                 for (const [key, value] of Object.entries(obj_paths)) {
-                    document.getElementById("menu").innerHTML += menu_template.replace("{objid}", key).replace("{objid}", key);
-                    document.getElementById("menu").lastChild.addEventListener("click", function() {set_star(key);});
+                    document.getElementById("menu").innerHTML += menu_template.replaceAll("{objid}", key);
+                }
+
+                //Loop again to add event listeners
+                for (var i = 0; i < Object.entries(obj_paths).length; i++) {
+                    document.getElementById("menu").children[i].addEventListener("click", set_star_delegate(Object.entries(obj_paths)[i][0]));
                 }
 
                 //Init JS9
                 JS9.init();
+                console.log("Loading complete.");
             }
 
             async function set_star(objid) {
@@ -114,14 +119,20 @@
                 document.getElementById("header2").innerHTML = "# in F814W: " + frames814[objid] + "    |    # in F475W: " + frames475[objid];
 
                 for (var i = 0; i < Math.min(frames814[objid], 3); i++) {
-                    JS9.Load(path + "f814_" + i + ".fits", {display: "disp1" + i});
+                    JS9.Load(path + "f814_" + i + ".fits", {display: "disp1" + i, refresh: true});
                     await sleep(100);
                 }
                 for (var i = 0; i < Math.min(frames475[objid], 3); i++) {
-                    JS9.Load(path + "f475_" + i + ".fits", {display: "disp2" + i});
+                    JS9.Load(path + "f475_" + i + ".fits", {display: "disp2" + i, refresh: true});
                     await sleep(100);
                 }
 
+            }
+
+            function set_star_delegate(objid) {
+                return function() {
+                    set_star(objid);
+                }
             }
 
             function read_file(file)
@@ -151,7 +162,7 @@
                 <td></td>
                 <td>
                     <h1 class="label">PULSATION</h1>
-                    <h2 class="label">v0.1.1b</h2>
+                    <h2 class="label">v0.1.3b</h2>
                     <p class="label" id="header1"></p>
                     <p class="label" id="header2"></p>
                 </td>
