@@ -119,14 +119,24 @@
                 document.getElementById("header2").innerHTML = "# in F814W: " + frames814[objid] + "    |    # in F475W: " + frames475[objid];
 
                 for (var i = 0; i < Math.min(frames814[objid], 3); i++) {
+                    document.getElementById("cont1" + i).style.display = "table-cell";
                     JS9.Load(path + "f814_" + i + ".fits", {display: "disp1" + i, refresh: true});
                     await sleep(100);
                 }
                 for (var i = 0; i < Math.min(frames475[objid], 3); i++) {
+                    document.getElementById("cont2" + i).style.display = "table-cell";
                     JS9.Load(path + "f475_" + i + ".fits", {display: "disp2" + i, refresh: true});
                     await sleep(100);
                 }
 
+                //Remove unused tds
+                for (var i = Math.min(frames814[objid], 3); i < 3; i++) {
+                    document.getElementById("cont1" + i).style.display = "none";
+                }
+
+                for (var i = Math.min(frames475[objid], 3); i < 3; i++) {
+                    document.getElementById("cont2" + i).style.display = "none";
+                }
             }
 
             function set_star_delegate(objid) {
@@ -168,19 +178,19 @@
                 </td>
             </tr>
             <tr>
-                <td>
+                <td id="cont10">
                     <p class="label">F814W Cutout 1</p>
                     <div class="JS9Menubar" id="disp10-Menubar"></div>
                     <div class="JS9" id="disp10" data-js9init="false"></div>
                     <div class="JS9Colorbar" id="disp10-Colorbar"></div>
                 </td>
-                <td>
+                <td id="cont11">
                     <p class="label">F814W Cutout 2</p>
                     <div class="JS9Menubar" id="disp11-Menubar"></div>
                     <div class="JS9" id="disp11"></div>
                     <div class="JS9Colorbar" id="disp11-Colorbar"></div>
                 </td>
-                <td>
+                <td id="cont12">
                     <p class="label">F814W Cutout 3</p>
                     <div class="JS9Menubar" id="disp12-Menubar"></div>
                     <div class="JS9" id="disp12"></div>
@@ -189,19 +199,19 @@
             </tr>
 
             <tr>
-                <td>
+                <td id="cont20">
                     <p class="label">F475W Cutout 1</p>
                     <div class="JS9Menubar" id="disp20-Menubar"></div>
                     <div class="JS9" id="disp20" data-js9init="false"></div>
                     <div class="JS9Colorbar" id="disp20-Colorbar"></div>
                 </td>
-                <td>
+                <td id="cont21">
                     <p class="label">F475W Cutout 2</p>
                     <div class="JS9Menubar" id="disp21-Menubar"></div>
                     <div class="JS9" id="disp21"></div>
                     <div class="JS9Colorbar" id="disp21-Colorbar"></div>
                 </td>
-                <td>
+                <td id="cont22">
                     <p class="label">F475W Cutout 3</p>
                     <div class="JS9Menubar" id="disp22-Menubar"></div>
                     <div class="JS9" id="disp22"></div>
